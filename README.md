@@ -1,1 +1,299 @@
-# tools
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Media Compressor Pro | Optimize Images & Videos</title>
+    <meta name="description" content="Compress and optimize images and videos online. Reduce file sizes while maintaining quality with our advanced compression tool.">
+    <meta name="keywords" content="image compressor, video compression, optimize media, reduce file size, online compressor">
+    
+    <!-- SEO Meta Tags -->
+    <meta property="og:title" content="Media Compressor Pro">
+    <meta property="og:description" content="Optimize your media files with our advanced compression tool">
+    
+    <!-- Google AdSense Script -->
+    <script async src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-XXXXXXXXXXXXXXXX"
+    crossorigin="anonymous"></script>
+
+    <style>
+        :root {
+            --primary-color: #2c3e50;
+            --secondary-color: #3498db;
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Arial', sans-serif;
+            line-height: 1.6;
+            padding: 20px;
+            background-color: #f5f6fa;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+        }
+
+        .header {
+            text-align: center;
+            padding: 2rem 0;
+            background-color: var(--primary-color);
+            color: white;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+
+        .main-content {
+            display: grid;
+            grid-template-columns: 3fr 1fr;
+            gap: 20px;
+        }
+
+        .compression-section {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+
+        .ad-section {
+            background: #fff;
+            padding: 15px;
+            border-radius: 10px;
+        }
+
+        .file-input {
+            margin: 20px 0;
+            padding: 15px;
+            border: 2px dashed var(--secondary-color);
+            text-align: center;
+            cursor: pointer;
+        }
+
+        .compression-controls {
+            margin: 20px 0;
+        }
+
+        .quality-slider {
+            width: 100%;
+            margin: 15px 0;
+        }
+
+        .preview-section {
+            margin-top: 20px;
+            display: none;
+        }
+
+        .download-btn {
+            background-color: var(--secondary-color);
+            color: white;
+            padding: 10px 20px;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            display: none;
+        }
+
+        @media (max-width: 768px) {
+            .main-content {
+                grid-template-columns: 1fr;
+            }
+            
+            .ad-section {
+                order: -1;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <!-- Ad Section -->
+        <div class="ad-section">
+            <!-- Google AdSense Unit -->
+            <ins class="adsbygoogle"
+                style="display:block"
+                data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                data-ad-slot="XXXXXXXXXX"
+                data-ad-format="auto"
+                data-full-width-responsive="true"></ins>
+            <script>
+                (adsbygoogle = window.adsbygoogle || []).push({});
+            </script>
+        </div>
+
+        <header class="header">
+            <h1>Media Compressor Pro</h1>
+            <p>Optimize your images and videos for web and mobile</p>
+        </header>
+
+        <main class="main-content">
+            <div class="compression-section">
+                <div class="file-input" id="fileDropZone">
+                    Drag & Drop or Click to Upload Files
+                    <input type="file" id="fileInput" hidden accept="image/*, video/*">
+                </div>
+
+                <div class="compression-controls">
+                    <label>Compression Level: <span id="qualityValue">80</span>%</label>
+                    <input type="range" id="qualitySlider" class="quality-slider" 
+                           min="1" max="100" value="80">
+                </div>
+
+                <div class="preview-section" id="preview">
+                    <!-- Preview content will be injected here -->
+                </div>
+
+                <button class="download-btn" id="downloadBtn">Download Compressed File</button>
+            </div>
+
+            <div class="ad-section">
+                <!-- Additional Ad Unit -->
+                <ins class="adsbygoogle"
+                    style="display:block"
+                    data-ad-client="ca-pub-XXXXXXXXXXXXXXXX"
+                    data-ad-slot="XXXXXXXXXX"
+                    data-ad-format="auto"
+                    data-full-width-responsive="true"></ins>
+                <script>
+                    (adsbygoogle = window.adsbygoogle || []).push({});
+                </script>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        // Compression configuration
+        const config = {
+            image: {
+                maxWidth: 1920,
+                maxHeight: 1080,
+                quality: 0.8
+            },
+            video: {
+                bitrate: 2000000,
+                format: 'webm'
+            }
+        };
+
+        // DOM Elements
+        const fileInput = document.getElementById('fileInput');
+        const qualitySlider = document.getElementById('qualitySlider');
+        const qualityValue = document.getElementById('qualityValue');
+        const downloadBtn = document.getElementById('downloadBtn');
+        const previewSection = document.getElementById('preview');
+
+        // Event Listeners
+        fileInput.addEventListener('change', handleFileUpload);
+        qualitySlider.addEventListener('input', updateQuality);
+        downloadBtn.addEventListener('click', downloadFile);
+
+        // Drag & Drop functionality
+        const dropZone = document.getElementById('fileDropZone');
+        dropZone.addEventListener('dragover', handleDragOver);
+        dropZone.addEventListener('drop', handleDrop);
+
+        let compressedFile = null;
+
+        function handleFileUpload(e) {
+            const file = e.target.files[0];
+            processFile(file);
+        }
+
+        function handleDrop(e) {
+            e.preventDefault();
+            const file = e.dataTransfer.files[0];
+            processFile(file);
+        }
+
+        function handleDragOver(e) {
+            e.preventDefault();
+        }
+
+        function updateQuality() {
+            qualityValue.textContent = qualitySlider.value;
+            config.image.quality = qualitySlider.value / 100;
+        }
+
+        async function processFile(file) {
+            if (file.type.startsWith('image/')) {
+                await compressImage(file);
+            } else if (file.type.startsWith('video/')) {
+                await compressVideo(file);
+            }
+            previewSection.style.display = 'block';
+            downloadBtn.style.display = 'block';
+        }
+
+        async function compressImage(file) {
+            const image = await createImageBitmap(file);
+            const canvas = document.createElement('canvas');
+            const ctx = canvas.getContext('2d');
+
+            // Calculate new dimensions
+            let width = image.width;
+            let height = image.height;
+            if (width > config.image.maxWidth) {
+                height *= config.image.maxWidth / width;
+                width = config.image.maxWidth;
+            }
+            if (height > config.image.maxHeight) {
+                width *= config.image.maxHeight / height;
+                height = config.image.maxHeight;
+            }
+
+            canvas.width = width;
+            canvas.height = height;
+            ctx.drawImage(image, 0, 0, width, height);
+
+            canvas.toBlob(blob => {
+                compressedFile = new File([blob], file.name, {
+                    type: 'image/jpeg',
+                    lastModified: Date.now()
+                });
+                showPreview(compressedFile);
+            }, 'image/jpeg', config.image.quality);
+        }
+
+        async function compressVideo(file) {
+            // Video compression would require more complex handling
+            // This is a simplified example using basic techniques
+            const compressedBlob = await new Promise((resolve) => {
+                const reader = new FileReader();
+                reader.onload = () => {
+                    // In real implementation, use FFmpeg.wasm or similar
+                    resolve(new Blob([reader.result], {type: 'video/mp4'}));
+                };
+                reader.readAsArrayBuffer(file);
+            });
+            
+            compressedFile = new File([compressedBlob], file.name, {
+                type: 'video/mp4',
+                lastModified: Date.now()
+            });
+            showPreview(compressedFile);
+        }
+
+        function showPreview(file) {
+            previewSection.innerHTML = file.type.startsWith('image/') 
+                ? `<img src="${URL.createObjectURL(file)}" alt="Compressed preview" style="max-width:100%;">`
+                : `<video controls style="max-width:100%;"><source src="${URL.createObjectURL(file)}"></video>`;
+        }
+
+        function downloadFile() {
+            const url = URL.createObjectURL(compressedFile);
+            const a = document.createElement('a');
+            a.href = url;
+            a.download = `compressed_${compressedFile.name}`;
+            document.body.appendChild(a);
+            a.click();
+            document.body.removeChild(a);
+            URL.revokeObjectURL(url);
+        }
+    </script>
+</body>
+</html>
